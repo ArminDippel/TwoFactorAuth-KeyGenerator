@@ -2,3 +2,5 @@
 /build/
 .project
 .classpath
+scopevisio_rsa_*
+

@@ -51,7 +51,7 @@ public class Main {
 		try {
 			// basic window setup
 			window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			window.setSize(500, 400);
+			window.setSize(500, 450);
 			window.setTitle(TITLE);
 			window.setLocationRelativeTo(null);
 			URL resource = Main.class.getResource("scope_64.png");
@@ -64,12 +64,14 @@ public class Main {
 			logger.setLineWrap(true);
 			logger.setBackground(Color.WHITE);
 			logger.setForeground(Color.BLACK);
-
-			// show up
 			window.add(logger, BorderLayout.CENTER);
 			window.setVisible(true);
-			createAndTestKeyPair();
-			log("\n\nSchlüsselpaar erfolgreich erzeugt.");
+
+			String[] keyPairs = createAndTestKeyPair();
+			log("\n\nSchlüsselpaar erfolgreich erzeugt.\n");
+			log("\nIhr öffentlicher Schlüssel:\n  " + keyPairs[0] + "\n");
+			log("\nIhr privater Schlüssel:\n  " + keyPairs[1] + "\n");
+
 		} catch (Exception e) {
 			log("\n\nSchlüsselpaar-Erzeugung mit Fehlern fehlgeschlagen (" + e.getLocalizedMessage() + ")");
 		}
@@ -82,7 +84,7 @@ public class Main {
 		logger.setText(currentText);
 	}
 
-	private static void createAndTestKeyPair() throws Exception {
+	private static String[] createAndTestKeyPair() throws Exception {
 		log("\nVorbereiten der Schlüsselerzeugung... ");
 		DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
 		Date date = new Date();
@@ -105,11 +107,11 @@ public class Main {
 		log("Ok.\nSchreiben der Schlüsseldateien... ");
 		keyPairGen.writePublicKey(publicKeyFile.toFile().getAbsolutePath(), keyComment);
 		keyPairGen.writePrivateKey(privateKeyFile.toFile().getAbsolutePath());
-		log("\n" + publicKeyFile.toFile().getAbsolutePath());
-		log("\n" + privateKeyFile.toFile().getAbsolutePath());
+		String[] keyPairPaths = new String[] { publicKeyFile.toFile().getAbsolutePath(),
+				privateKeyFile.toFile().getAbsolutePath() };
 		keyPairGen.dispose();
 
-		log("\nLesen des Schlüsselpaars aus den erzeugten Dateien... ");
+		log("Ok.\nLesen des Schlüsselpaars aus den erzeugten Dateien... ");
 		String publicKeyBody = new String(Files.readAllBytes(publicKeyFile));
 		String privateKeyBody = new String(Files.readAllBytes(privateKeyFile));
 		PublicKey publicKey = readPublicKey(publicKeyBody);
@@ -136,6 +138,7 @@ public class Main {
 		} else {
 			log("Erfolgreich.");
 		}
+		return keyPairPaths;
 	}
 
 	public static PrivateKey readPrivateKey(String body) throws GeneralSecurityException, IOException {
